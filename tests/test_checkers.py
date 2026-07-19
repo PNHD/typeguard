@@ -14,6 +14,7 @@ from typing import (
     AnyStr,
     BinaryIO,
     Callable,
+    ClassVar,
     Collection,
     Concatenate,
     ContextManager,
@@ -1341,6 +1342,36 @@ class TestProtocol:
                 f"{MyProtocol.__qualname__} protocol because it has no attribute named "
                 f"'member'"
             )
+
+    def test_class_against_protocol_ignores_instance_attributes(self) -> None:
+        # Checking a class (not an instance) against type[Protocol] must not
+        # flag instance attributes as missing; only ClassVar members are
+        # required on the class itself. See issue #499.
+        class MyProtocol(Protocol):
+            foo: str
+
+        class Foo:
+            def __init__(self) -> None:
+                self.foo = "bar"
+
+        check_type(Foo, type[MyProtocol])
+
+    def test_class_against_protocol_requires_classvar(self) -> None:
+        class MyProtocol(Protocol):
+            bar: ClassVar[int]
+
+        class Missing:
+            pass
+
+        pytest.raises(TypeCheckError, check_type, Missing, type[MyProtocol]).match(
+            f"is not compatible with the {MyProtocol.__qualname__} protocol "
+            f"because it has no attribute named 'bar'"
+        )
+
+        class Present:
+            bar = 3
+
+        check_type(Present, type[MyProtocol])
 
     def test_missing_method(self) -> None:
         class MyProtocol(Protocol):

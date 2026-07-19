@@ -13,6 +13,10 @@ This library adheres to
   ``TypeError`` for a non-iterable value and silently replaced an iterable value with
   ``list(value)``
   (`#557 <https://github.com/agronholm/typeguard/issues/557>`_)
+- Fixed false positive when checking a class against ``type[SomeProtocol]`` where the
+  protocol declares non-``ClassVar`` (instance) attributes; only ``ClassVar`` members
+  are now required on the class itself
+  (`#499 <https://github.com/agronholm/typeguard/issues/499>`_)
 - Dropped support for Python 3.9
 
 **4.5.2** (2026-05-14)
