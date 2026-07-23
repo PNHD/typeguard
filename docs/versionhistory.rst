@@ -24,6 +24,10 @@ This library adheres to
   would not match if an ``==`` equal ``int`` came first (``Literal[1, True]`` rejected
   ``True``, but ``Literal[True, 1]`` accepted it)
   (`#566 <https://github.com/agronholm/typeguard/pull/566>`_; PR by @uttam12331)
+- Fixed the import hook/instrumenter erasing the subscript of an empty tuple annotation
+  (``tuple[()]``) down to a bare ``tuple``, causing any tuple (including non-empty ones)
+  to pass the check
+  (`#565 <https://github.com/agronholm/typeguard/pull/565>`_; PR by @chuenchen309)
 - Dropped support for Python 3.9
 
 **4.5.2** (2026-05-14)
