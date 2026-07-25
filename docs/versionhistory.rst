@@ -6,6 +6,8 @@ This library adheres to
 
 **UNRELEASED**
 
+- Added support for type checking against the PEP 661 ``sentinel`` type (built-in on
+  Python 3.15 and available on ``typing_extensions`` for earlier Pythons)
 - Added the ``typeguard-packages-ignore`` option (``--typeguard-packages-ignore`` on the
   command line) to the pytest plugin to exclude specific packages from type checking
   (`#523 <https://github.com/agronholm/typeguard/issues/523>`_)

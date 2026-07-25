@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 import collections.abc
 import inspect
 import sys
@@ -91,6 +92,11 @@ generic_alias_types: tuple[type, ...] = (
 
 # Sentinel
 _missing = object()
+
+# PEP 661 sentinel type instances (typing_extensions.Sentinel, built-in sentinel in 3.15+)
+_sentinel_types: tuple[type, ...] = (typing_extensions.Sentinel,)
+if sys.version_info >= (3, 15):
+    _sentinel_types += (builtins.sentinel,)
 
 # Lifted from mypy.sharedparse
 BINARY_MAGIC_METHODS = {
@@ -643,6 +649,16 @@ def check_none(
         raise TypeCheckError("is not None")
 
 
+def check_sentinel(
+    value: Any,
+    origin_type: Any,
+    args: tuple[Any, ...],
+    memo: TypeCheckMemo,
+) -> None:
+    if value is not origin_type:
+        raise TypeCheckError(f"is not {origin_type!r}")
+
+
 def check_number(
     value: Any,
     origin_type: Any,
@@ -1090,6 +1106,8 @@ def builtin_checker_lookup(
     ):
         # typing.NewType on Python 3.9
         return check_newtype
+    elif isinstance(origin_type, _sentinel_types):
+        return check_sentinel
 
     return None
 

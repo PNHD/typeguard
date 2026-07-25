@@ -53,7 +53,7 @@ from typeguard import (
     check_type_internal,
     suppress_type_checks,
 )
-from typeguard._checkers import is_typeddict
+from typeguard._checkers import _sentinel_types, is_typeddict
 from typeguard._utils import qualified_name
 
 from . import (
@@ -1690,6 +1690,27 @@ def test_any_subclass():
         pass
 
     check_type(Foo(), int)
+
+
+@pytest.mark.parametrize("sentinel_type", _sentinel_types)
+def test_sentinel(sentinel_type):
+    MISSING = sentinel_type("MISSING")
+    check_type(MISSING, MISSING)
+    pytest.raises(TypeCheckError, check_type, None, MISSING)
+
+
+@pytest.mark.parametrize("sentinel_type", _sentinel_types)
+def test_sentinel_in_union(sentinel_type):
+    MISSING = sentinel_type("MISSING")
+    check_type(MISSING, str | MISSING)
+    check_type("foo", str | MISSING)
+    with pytest.raises(
+        TypeCheckError, match=r"did not match any element in the union"
+    ) as exc:
+        check_type(42, str | MISSING)
+
+    assert "str: is not an instance of str" in str(exc.value)
+    assert "MISSING" in str(exc.value)
 
 
 def test_none():
