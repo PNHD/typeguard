@@ -131,6 +131,13 @@ list of package names)::
     install_import_hook('myapp')
     from myapp import some_module  # import only AFTER installing the hook, or it won't take effect
 
+You can also exclude specific packages or modules from instrumentation using the
+``ignore_packages`` parameter::
+
+    from typeguard import install_import_hook
+
+    install_import_hook('myapp', ignore_packages=['myapp.tests'])
+
 If you wish, you can uninstall the import hook::
 
     manager = install_import_hook('myapp')
@@ -184,7 +191,12 @@ Typeguard comes with a plugin for pytest (v7.0 or newer) that installs the impor
 
     pytest --typeguard-packages=foo.bar,xyz
 
-It is also possible to set option for the pytest plugin using pytest's own
+You can also exclude specific packages or modules from type checking using the
+``--typeguard-packages-ignore`` option::
+
+    pytest --typeguard-packages=foo.bar,xyz --typeguard-packages-ignore=foo.bar.tests
+
+It is also possible to set options for the pytest plugin using pytest's own
 configuration. For example, here's how you might specify several options in
 ``pyproject.toml``:
 
@@ -194,6 +206,8 @@ configuration. For example, here's how you might specify several options in
     typeguard-packages = """
     foo.bar
     xyz"""
+    typeguard-packages-ignore = """
+    foo.bar.tests"""
     typeguard-debug-instrumentation = true
     typeguard-typecheck-fail-callback = "mypackage:failcallback"
     typeguard-forward-ref-policy = "ERROR"

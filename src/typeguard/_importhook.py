@@ -4,7 +4,7 @@ import ast
 import os
 import sys
 import types
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Collection, Iterable, Sequence
 from importlib.abc import MetaPathFinder
 from importlib.machinery import ModuleSpec, SourceFileLoader
 from importlib.util import cache_from_source, decode_source
@@ -140,9 +140,15 @@ class TypeguardFinder(MetaPathFinder):
     .. versionadded:: 2.6
     """
 
-    def __init__(self, packages: list[str] | None, original_pathfinder: MetaPathFinder):
+    def __init__(
+        self,
+        packages: list[str] | None,
+        original_pathfinder: MetaPathFinder,
+        ignore_packages: Collection[str] = (),
+    ):
         self.packages = packages
         self._original_pathfinder = original_pathfinder
+        self.ignore_packages = ignore_packages
 
     def find_spec(
         self,
@@ -166,6 +172,10 @@ class TypeguardFinder(MetaPathFinder):
             ``xyz.abc``)
 
         """
+        for package in self.ignore_packages:
+            if module_name == package or module_name.startswith(package + "."):
+                return False
+
         if self.packages is None:
             return True
 
@@ -205,6 +215,7 @@ class ImportHookManager:
 
 def install_import_hook(
     packages: Iterable[str] | None = None,
+    ignore_packages: Iterable[str] = (),
     *,
     cls: type[TypeguardFinder] = TypeguardFinder,
 ) -> ImportHookManager:
@@ -215,6 +226,8 @@ def install_import_hook(
 
     :param packages: an iterable of package names to instrument, or ``None`` to
         instrument all packages
+    :param ignore_packages: an iterable of package names to exclude from
+        instrumentation, even if they match ``packages``
     :param cls: a custom meta path finder class
     :return: a context manager that uninstalls the hook on exit (or when you call
         ``.uninstall()``)
@@ -229,6 +242,11 @@ def install_import_hook(
     else:
         target_packages = list(packages)
 
+    if isinstance(ignore_packages, str):
+        target_ignore_packages: list[str] = [ignore_packages]
+    else:
+        target_ignore_packages = list(ignore_packages)
+
     for finder in sys.meta_path:
         if (
             isclass(finder)
@@ -239,6 +257,6 @@ def install_import_hook(
     else:
         raise RuntimeError("Cannot find a PathFinder in sys.meta_path")
 
-    hook = cls(target_packages, finder)
+    hook = cls(target_packages, finder, target_ignore_packages)
     sys.meta_path.insert(0, hook)
     return ImportHookManager(hook)

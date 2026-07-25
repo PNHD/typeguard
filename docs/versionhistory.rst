@@ -6,6 +6,9 @@ This library adheres to
 
 **UNRELEASED**
 
+- Added the ``typeguard-packages-ignore`` option (``--typeguard-packages-ignore`` on the
+  command line) to the pytest plugin to exclude specific packages from type checking
+  (`#523 <https://github.com/agronholm/typeguard/issues/523>`_)
 - Added recognition of wildcard imports from ``typing`` and ``typing_extensions`` in the
   import hook/instrumenter
   (`#489 <https://github.com/agronholm/typeguard/issues/489>`_; PR by @ShipitAndPray)
