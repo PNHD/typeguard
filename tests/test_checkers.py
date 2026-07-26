@@ -810,12 +810,6 @@ class TestFrozenSet:
         pytest.param(
             tuple,
             id="builtin",
-            marks=[
-                pytest.mark.skipif(
-                    sys.version_info < (3, 9),
-                    reason="builtins.tuple is not parametrizable before Python 3.9",
-                )
-            ],
         ),
     ],
 )
@@ -907,15 +901,7 @@ class TestUnion:
         "annotation",
         [
             pytest.param(Union[str, int], id="pep484"),
-            pytest.param(
-                ForwardRef("str | int"),
-                id="pep604",
-                marks=[
-                    pytest.mark.skipif(
-                        sys.version_info < (3, 10), reason="Requires Python 3.10+"
-                    )
-                ],
-            ),
+            pytest.param(ForwardRef("str | int"), id="pep604"),
         ],
     )
     @pytest.mark.parametrize(
@@ -968,7 +954,6 @@ class TestUnion:
         sys.implementation.name != "cpython",
         reason="Test relies on CPython's reference counting behavior",
     )
-    @pytest.mark.skipif(sys.version_info < (3, 10), reason="UnionType requires 3.10")
     def test_uniontype_reference_leak(self):
         class Leak:
             def __del__(self):
@@ -1000,11 +985,9 @@ class TestUnion:
         inner3()
         assert not leaked
 
-    @pytest.mark.skipif(sys.version_info < (3, 10), reason="UnionType requires 3.10")
     def test_raw_uniontype_success(self):
         check_type(str | int, types.UnionType)
 
-    @pytest.mark.skipif(sys.version_info < (3, 10), reason="UnionType requires 3.10")
     def test_raw_uniontype_fail(self):
         if sys.version_info < (3, 14):
             expected_type = r"\w+\.UnionType"

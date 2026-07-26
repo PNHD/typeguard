@@ -556,7 +556,6 @@ def test_retain_dunder_attributes():
     assert foo.__defaults__ == ("foo",)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="Requires ast.unparse()")
 def test_debug_instrumentation(monkeypatch, capsys):
     monkeypatch.setattr("typeguard.config.debug_instrumentation", True)
 

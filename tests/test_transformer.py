@@ -1270,36 +1270,6 @@ dict[str, int])}, memo)
             ).strip()
         )
 
-    @pytest.mark.skipif(sys.version_info >= (3, 10), reason="Requires Python < 3.10")
-    def test_pep604_assign(self) -> None:
-        node = parse(
-            dedent(
-                """
-                Union = None
-
-                def foo() -> None:
-                    x: int | str = otherfunc()
-                """
-            )
-        )
-        TypeguardTransformer().visit(node)
-        assert (
-            unparse(node)
-            == dedent(
-                """
-                from typeguard import TypeCheckMemo
-                from typeguard._functions import check_variable_assignment
-                from typing import Union as Union_
-                Union = None
-
-                def foo() -> None:
-                    memo = TypeCheckMemo(globals(), locals())
-                    x: int | str = check_variable_assignment(otherfunc(), \
-[('x', Union_[int, str])], memo)
-                """
-            ).strip()
-        )
-
     def test_multi_assign(self) -> None:
         node = parse(
             dedent(

@@ -9,7 +9,7 @@ import typing
 import warnings
 from collections.abc import Mapping, MutableMapping, Sequence
 from enum import Enum
-from inspect import Parameter, isclass, isfunction
+from inspect import Parameter, isclass
 from io import BufferedIOBase, IOBase, RawIOBase, TextIOBase
 from itertools import zip_longest
 from textwrap import indent
@@ -1096,15 +1096,6 @@ def builtin_checker_lookup(
     elif isinstance(origin_type, TypeVar):
         return check_typevar
     elif origin_type.__class__ is NewType:
-        # typing.NewType on Python 3.10+
-        return check_newtype
-    elif (
-        isfunction(origin_type)
-        and getattr(origin_type, "__module__", None) == "typing"
-        and getattr(origin_type, "__qualname__", "").startswith("NewType.")
-        and hasattr(origin_type, "__supertype__")
-    ):
-        # typing.NewType on Python 3.9
         return check_newtype
     elif isinstance(origin_type, _sentinel_types):
         return check_sentinel

@@ -91,7 +91,6 @@ def test_ignore_packages_with_blanket_import():
     assert not finder.should_instrument("ham.ignoreme.sub")
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="Requires ast.unparse()")
 def test_debug_instrumentation(monkeypatch, capsys):
     monkeypatch.setattr("typeguard.config.debug_instrumentation", True)
     import_dummymodule()
