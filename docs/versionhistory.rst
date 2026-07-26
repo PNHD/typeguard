@@ -4,7 +4,7 @@ Version history
 This library adheres to
 `Semantic Versioning 2.0 <https://semver.org/#semantic-versioning-200>`_.
 
-**UNRELEASED**
+**4.6.0** (2026-07-26)
 
 - Added support for type checking against the PEP 661 ``sentinel`` type (built-in on
   Python 3.15 and available on ``typing_extensions`` for earlier Pythons)
