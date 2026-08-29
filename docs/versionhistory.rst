@@ -4,6 +4,12 @@ Version history
 This library adheres to
 `Semantic Versioning 2.0 <https://semver.org/#semantic-versioning-200>`_.
 
+**UNRELEASED**
+
+- Fixed ``ReadOnly`` (:pep:`705`) qualifiers on ``TypedDict`` items being left
+  unwrapped, which caused the item's value type to skip type checking entirely
+  (`#571 <https://github.com/agronholm/typeguard/pull/571>`_; PR by @jaideeppyne)
+
 **4.6.0** (2026-07-26)
 
 - Added support for type checking against the PEP 661 ``sentinel`` type (built-in on
